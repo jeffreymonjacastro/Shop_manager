@@ -37,7 +37,7 @@ class Product(db.Model):
   Class product
   """
 
-  __tablename__ = 'person'
+  __tablename__ = 'Product'
   __table_args__ = {'schema': 'shop_manager'}
 
   id: int
@@ -52,7 +52,8 @@ class Product(db.Model):
   id = db.Column(
     db.Integer, 
     primary_key=True, 
-    autoincrement=True
+    autoincrement=True,
+    unique=True
   )
 
   title = db.Column(
@@ -97,7 +98,7 @@ class Carshop(db.Model):
   Class carshop
   """
 
-  __tablename__ = 'person'
+  __tablename__ = 'Carshop'
   __table_args__ = {'schema': 'shop_manager'}
 
   id: int
@@ -107,7 +108,8 @@ class Carshop(db.Model):
   id = db.Column(
     db.Integer, 
     primary_key=True, 
-    autoincrement=True
+    autoincrement=True,
+    unique=True
   )
 
   meal = db.Column(
@@ -128,7 +130,7 @@ class Menu(db.Model):
   Class menu
   """
 
-  __tablename__ = 'person'
+  __tablename__ = 'Menu'
   __table_args__ = {'schema': 'shop_manager'}
 
   id: int
@@ -151,6 +153,36 @@ class Menu(db.Model):
     nullable=False
   )
 
+# Tabla de unión para la relación muchos a muchos entre Product y Carshop
+belong_car_table = db.Table(
+  'Belongcar',
+  db.Column(
+    'product_id', 
+    db.Integer, 
+    db.ForeignKey('shop_manager.Product.id')
+  ),
+  db.Column(
+    'carshop_id', 
+    db.Integer, 
+    db.ForeignKey('shop_manager.Carshop.id')
+  )
+)
+
+# Tabla de unión para la relación muchos a muchos entre Product y Menu
+belong_menu_table = db.Table(
+  'Belongmenu',
+  db.Column(
+    'product_id', 
+    db.Integer, 
+    db.ForeignKey('shop_manager.Product.id')
+  ),
+  db.Column(
+    'menu_id', 
+    db.Integer, 
+    db.ForeignKey('shop_manager.Menu.id')
+  )
+)
+
 
 @dataclass
 class Belong_car(db.Model):
@@ -158,7 +190,7 @@ class Belong_car(db.Model):
   Class belong_car
   """
 
-  __tablename__ = 'person'
+  __tablename__ = 'Belong_car'
   __table_args__ = {'schema': 'shop_manager'}
 
   product_id: int
@@ -166,25 +198,28 @@ class Belong_car(db.Model):
 
   product_id = db.Column(
     db.Integer, 
-    db.ForeignKey('Product.id'),
+    db.ForeignKey('shop_manager.Product.id'),
     primary_key=True, 
-  )
-
-  product = db.relationship(
-    'Product',
-    backref= 'Belong_car'
   )
 
   carshop_id = db.Column(
     db.Integer, 
-    db.ForeignKey('Carshop.id'),
+    db.ForeignKey('shop_manager.Carshop.id'),
     primary_key=True, 
   )
 
-  carshop = db.relationship(
-    'Carshop',
-    backref= 'Belong_car'
+  r_product = db.relationship(
+    Product, 
+    backref='carshops', 
+    secondary=belong_car_table
   )
+
+  r_carshop = db.relationship(
+    Carshop, 
+    backref='products', 
+    secondary=belong_car_table
+  )
+
 
 
 @dataclass
@@ -193,7 +228,7 @@ class Belong_menu(db.Model):
   Class belong_menu
   """
 
-  __tablename__ = 'person'
+  __tablename__ = 'Belong_menu'
   __table_args__ = {'schema': 'shop_manager'}
 
   product_id: int
@@ -203,24 +238,26 @@ class Belong_menu(db.Model):
 
   product_id = db.Column(
     db.Integer, 
-    db.ForeignKey('Product.id'),
+    db.ForeignKey('shop_manager.Product.id'),
     primary_key=True, 
-  )
-
-  product = db.relationship(
-    'Product',
-    backref= 'Belong_menu'
   )
 
   menu_id = db.Column(
     db.Integer, 
-    db.ForeignKey('Menu.id'),
+    db.ForeignKey('shop_manager.Menu.id'),
     primary_key=True, 
   )
 
-  menu = db.relationship(
-    'Menu',
-    backref= 'Belong_menu'
+  r_product = db.relationship(
+    Product, 
+    backref='menus', 
+    secondary=belong_menu_table
+  )
+
+  r_menu = db.relationship(
+    Menu, 
+    backref='products', 
+    secondary=belong_menu_table
   )
 
   amount = db.Column(
@@ -236,6 +273,52 @@ class Belong_menu(db.Model):
 
 with app.app_context():
   db.create_all()
+
+
+@app.route('/products', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def products():
+  """
+  Route of products
+  """
+
+  if request.method == 'GET':
+    products = Product.query.all()
+    return jsonify([product.__dict__ for product in products])
+
+  elif request.method == 'POST':
+    data = request.get_json()
+    product = Product(
+      title = data['title'],
+      price = data['price'],
+      category = data['category'],
+      quantity = data['quantity'],
+      type_of_quantity = data['type_of_quantity'],
+      brand = data['brand'],
+      image = convertToBinary(data['image'])
+    )
+    db.session.add(product)
+    db.session.commit()
+    return jsonify(product.__dict__)
+
+  elif request.method == 'PUT':
+    data = request.get_json()
+    product = Product.query.get(data['id'])
+    product.title = data['title']
+    product.price = data['price']
+    product.category = data['category']
+    product.quantity = data['quantity']
+    product.type_of_quantity = data['type_of_quantity']
+    product.brand = data['brand']
+    product.image = convertToBinary(data['image'])
+    db.session.commit()
+    return jsonify(product.__dict__)
+
+  elif request.method == 'DELETE':
+    data = request.get_json()
+    product = Product.query.get(data['id'])
+    db.session.delete(product)
+    db.session.commit()
+    return jsonify(product.__dict__)
 
 
 if __name__ == '__main__':
