@@ -190,7 +190,6 @@ class Belong_car(db.Model):
   )
 
 
-
 @dataclass
 class Belong_menu(db.Model):
   """
@@ -273,6 +272,7 @@ def menus():
   if request.method == 'GET':
     menus = Menu.query.all()
     return jsonify(menus)
+
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)

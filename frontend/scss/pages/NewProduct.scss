@@ -1,0 +1,21 @@
+.newproduct {
+  &-main {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-form {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+
+    & span {
+      display: block;
+      color: var(--color-warning);
+      font-size: small
+    }
+  }
+}

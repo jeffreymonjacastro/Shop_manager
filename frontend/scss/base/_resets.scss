@@ -17,6 +17,7 @@ a {
 
 button {
   border: none;
-  background: none;
+  background: var(--primary);
   font-family: var(--font-poppins);
+  color: var(--text-color);
 }
