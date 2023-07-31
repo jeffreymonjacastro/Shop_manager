@@ -154,40 +154,6 @@ class Menu(db.Model):
     nullable=False
   )
 
-# Tabla de unión para la relación muchos a muchos entre Product y Carshop
-belong_car_table = db.Table(
-  'Belongcar',
-  db.Column(
-    'product_id', 
-    db.Integer, 
-    db.ForeignKey('shop_manager.Product.id'),
-    primary_key=True
-  ),
-  db.Column(
-    'carshop_id', 
-    db.Integer, 
-    db.ForeignKey('shop_manager.Carshop.id'),
-    primary_key=True
-  )
-)
-
-# Tabla de unión para la relación muchos a muchos entre Product y Menu
-belong_menu_table = db.Table(
-  'Belongmenu',
-  db.Column(
-    'product_id', 
-    db.Integer, 
-    db.ForeignKey('shop_manager.Product.id'),
-    primary_key=True
-  ),
-  db.Column(
-    'menu_id', 
-    db.Integer, 
-    db.ForeignKey('shop_manager.Menu.id'),
-    primary_key=True
-  )
-)
-
 
 @dataclass
 class Belong_car(db.Model):
@@ -214,21 +180,13 @@ class Belong_car(db.Model):
   )
 
   r_product = db.relationship(
-    Product, 
-    backref='carshops', 
-    secondary=belong_car_table,
-    primaryjoin=(and_(
-      product_id == belong_car_table.c.product_id, 
-      carshop_id == belong_car_table.c.carshop_id))
+    'Product', 
+    backref='carshops'
   )
 
   r_carshop = db.relationship(
-    Carshop, 
-    backref='products', 
-    secondary=belong_car_table,
-    primaryjoin=(and_(
-      carshop_id == belong_car_table.c.carshop_id, 
-      product_id == belong_car_table.c.product_id))
+    'Carshop', 
+    backref='belong_car'
   )
 
 
@@ -260,21 +218,13 @@ class Belong_menu(db.Model):
   )
 
   r_product = db.relationship(
-    Product, 
-    backref='menus', 
-    secondary=belong_menu_table,
-    primaryjoin=(and_(
-      product_id == belong_menu_table.c.product_id, 
-      menu_id == belong_menu_table.c.menu_id))
+    'Product', 
+    backref='belong_menu', 
   )
 
   r_menu = db.relationship(
-    Menu, 
-    backref='products', 
-    secondary=belong_menu_table,
-    primaryjoin=(and_(
-      menu_id == belong_menu_table.c.menu_id,
-      product_id == belong_menu_table.c.product_id))
+    'Menu', 
+    backref='belong_menu'
   )
 
   amount = db.Column(
@@ -300,7 +250,7 @@ def products():
 
   if request.method == 'GET':
     products = Product.query.all()
-    return jsonify([product.__dict__ for product in products])
+    return jsonify(products)
 
 
 @app.route('/carshops', methods=['GET', 'POST', 'PUT', 'DELETE'])
@@ -311,7 +261,18 @@ def carshops():
 
   if request.method == 'GET':
     carshops = Carshop.query.all()
-    return jsonify([carshop.__dict__ for carshop in carshops])
+    return jsonify(carshops)
+
+
+@app.route('/menus', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def menus():
+  """
+  Route of menus
+  """
+
+  if request.method == 'GET':
+    menus = Menu.query.all()
+    return jsonify(menus)
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)
