@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy import and_
 from dataclasses import dataclass
 from datetime import datetime
 import os
@@ -159,12 +160,14 @@ belong_car_table = db.Table(
   db.Column(
     'product_id', 
     db.Integer, 
-    db.ForeignKey('shop_manager.Product.id')
+    db.ForeignKey('shop_manager.Product.id'),
+    primary_key=True
   ),
   db.Column(
     'carshop_id', 
     db.Integer, 
-    db.ForeignKey('shop_manager.Carshop.id')
+    db.ForeignKey('shop_manager.Carshop.id'),
+    primary_key=True
   )
 )
 
@@ -174,12 +177,14 @@ belong_menu_table = db.Table(
   db.Column(
     'product_id', 
     db.Integer, 
-    db.ForeignKey('shop_manager.Product.id')
+    db.ForeignKey('shop_manager.Product.id'),
+    primary_key=True
   ),
   db.Column(
     'menu_id', 
     db.Integer, 
-    db.ForeignKey('shop_manager.Menu.id')
+    db.ForeignKey('shop_manager.Menu.id'),
+    primary_key=True
   )
 )
 
@@ -211,13 +216,19 @@ class Belong_car(db.Model):
   r_product = db.relationship(
     Product, 
     backref='carshops', 
-    secondary=belong_car_table
+    secondary=belong_car_table,
+    primaryjoin=(and_(
+      product_id == belong_car_table.c.product_id, 
+      carshop_id == belong_car_table.c.carshop_id))
   )
 
   r_carshop = db.relationship(
     Carshop, 
     backref='products', 
-    secondary=belong_car_table
+    secondary=belong_car_table,
+    primaryjoin=(and_(
+      carshop_id == belong_car_table.c.carshop_id, 
+      product_id == belong_car_table.c.product_id))
   )
 
 
@@ -251,13 +262,19 @@ class Belong_menu(db.Model):
   r_product = db.relationship(
     Product, 
     backref='menus', 
-    secondary=belong_menu_table
+    secondary=belong_menu_table,
+    primaryjoin=(and_(
+      product_id == belong_menu_table.c.product_id, 
+      menu_id == belong_menu_table.c.menu_id))
   )
 
   r_menu = db.relationship(
     Menu, 
     backref='products', 
-    secondary=belong_menu_table
+    secondary=belong_menu_table,
+    primaryjoin=(and_(
+      menu_id == belong_menu_table.c.menu_id,
+      product_id == belong_menu_table.c.product_id))
   )
 
   amount = db.Column(
@@ -285,41 +302,16 @@ def products():
     products = Product.query.all()
     return jsonify([product.__dict__ for product in products])
 
-  elif request.method == 'POST':
-    data = request.get_json()
-    product = Product(
-      title = data['title'],
-      price = data['price'],
-      category = data['category'],
-      quantity = data['quantity'],
-      type_of_quantity = data['type_of_quantity'],
-      brand = data['brand'],
-      image = convertToBinary(data['image'])
-    )
-    db.session.add(product)
-    db.session.commit()
-    return jsonify(product.__dict__)
 
-  elif request.method == 'PUT':
-    data = request.get_json()
-    product = Product.query.get(data['id'])
-    product.title = data['title']
-    product.price = data['price']
-    product.category = data['category']
-    product.quantity = data['quantity']
-    product.type_of_quantity = data['type_of_quantity']
-    product.brand = data['brand']
-    product.image = convertToBinary(data['image'])
-    db.session.commit()
-    return jsonify(product.__dict__)
+@app.route('/carshops', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def carshops():
+  """
+  Route of carshops
+  """
 
-  elif request.method == 'DELETE':
-    data = request.get_json()
-    product = Product.query.get(data['id'])
-    db.session.delete(product)
-    db.session.commit()
-    return jsonify(product.__dict__)
-
+  if request.method == 'GET':
+    carshops = Carshop.query.all()
+    return jsonify([carshop.__dict__ for carshop in carshops])
 
 if __name__ == '__main__':
   app.run(debug=True, host='0.0.0.0', port=5000)
