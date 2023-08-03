@@ -21,7 +21,10 @@
     transition: transform 0.3s ease;
 
     &:hover {
-      background-color: var(--primary);
+      background-color: var(--secondary);
+      transform: scale(1.1);
+      transition: background-color 0.3s ease;
+      transition: transform 0.3s ease;
     }
   }
 
@@ -47,6 +50,10 @@
         align-items: center;
         padding: 20px 10px;
         border-bottom: var(--primary) 1px solid;
+
+        &:hover {
+          background-color: var(--secondary);
+        }
         
         & svg {
           width: 30%;
@@ -68,15 +75,22 @@
   &-logo {
     position: absolute;
     left: 8%;
-    background-color: var(--secondary);
     border-radius: 50%;
     height: 45px;
     width: 45px;
+
+    & img {
+      width: 100%;
+    }
   }
 
   &-title {
     position: absolute;
-    left: 26%;
+    left: 28%;
     font-size: .9em;
   }
+}
+
+.active {
+  background-color: var(--primary);
 }

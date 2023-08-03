@@ -1,5 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useLocation  } from 'react-router-dom'
 import { 
   faHouse,
   faPlusCircle,
@@ -12,6 +13,7 @@ import '../scss/pages/Navbar.scss'
 
 export const Navbar = () => {
   const [show, setShow] = useState<boolean>(true)
+  const location = useLocation()
 
   const back = useRef<HTMLElement>(null)
   const menu = useRef<HTMLDivElement>(null)
@@ -20,76 +22,66 @@ export const Navbar = () => {
   const car = useRef<HTMLLIElement>(null)
   const logo = useRef<HTMLDivElement>(null)
   const title = useRef<HTMLDivElement>(null)
-  
+
+
   const hideButtons = () => {
-    if (show) {
-      if (home.current) {
-        home.current.style.transform = 'translateY(-100%)'
-      }
-
-      if (add.current) {
-        add.current.style.transform = 'translateY(-100%)'
-      }
-
-      if (car.current) {
-        car.current.style.transform = 'translateY(-100%)'
-      }
-
-      if (logo.current) {
-        logo.current.style.transform = 'translateY(0)'
-      }
-
-      if (title.current) {
-        title.current.style.transform = 'translateY(0)'
-      }
-    } else {
-      if (home.current) {
-        home.current.style.transform = 'translateY(0)'
-      }
-
-      if (add.current) {
-        add.current.style.transform = 'translateY(0)'
-      }
-
-      if (car.current) {
-        car.current.style.transform = 'translateY(0)'
-      }
-
-      if (logo.current) {
-        logo.current.style.transform = 'translateY(-150%)'
-      }
-
-      if (title.current) {
-        title.current.style.transform = 'translateY(-150%)'
-      }
-    }
-  }
+    const translateYValue = show ? '-130%' : '0';
+    const translateYLogoTitle = show ? '0' : '-150%';
   
-  const showMenu = () => {
-    if (show) {
-      setShow(false)
-      hideButtons()
-
-      if (back.current) {
-        back.current.style.backdropFilter = 'blur(5px)'
-      }
-
-      if (menu.current) {
-        menu.current.style.transform = 'translateX(0)'
-      }
-    } else {
-      setShow(true)
-      hideButtons()
-
-      if (back.current) {
-        back.current.style.backdropFilter = 'blur(0)'
-      }
-
-      if (menu.current) {
-        menu.current.style.transform = 'translateX(100%)'
-      }
+    if (home.current) {
+      home.current.style.transform = `translateY(${translateYValue})`;
     }
+  
+    if (add.current) {
+      add.current.style.transform = `translateY(${translateYValue})`;
+    }
+  
+    if (car.current) {
+      car.current.style.transform = `translateY(${translateYValue})`;
+    }
+  
+    if (logo.current) {
+      logo.current.style.transform = `translateY(${translateYLogoTitle})`;
+    }
+  
+    if (title.current) {
+      title.current.style.transform = `translateY(${translateYLogoTitle})`;
+    }
+  };
+  
+
+  const showMenu = () => {
+    setShow((prevShow) => {      
+      hideButtons();
+
+      if (back.current) {
+        back.current.style.backdropFilter = prevShow ? 'blur(5px)' : 'blur(0)';
+      }
+
+      if (menu.current) {
+        menu.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(100%)';
+      }
+
+      return !prevShow;
+    })
   }
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      if (home.current) {
+        home.current.classList.add('active');
+      }
+    } else if (location.pathname === '/newproduct') {
+      if (add.current) {
+        add.current.classList.add('active');
+      }
+    } else if (location.pathname === '/carshop') {
+      if (car.current) {
+        car.current.classList.add('active');
+      }
+    }    
+  }, [])
+
 
   return (
     <>
@@ -101,7 +93,7 @@ export const Navbar = () => {
             </a>
           </li>
           <div ref={logo} className='nav-logo'>
-
+            <img src={'http://localhost:5173/frontend/assets/Shop_manager_logo.png'} alt="Logo Shop Manager" />
           </div>
           <p ref={title} className='nav-title'>
             Shop Manager
