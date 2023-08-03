@@ -120,7 +120,7 @@ class Carshop(db.Model):
   )
 
   date = db.Column(
-    db.DateTime, 
+    db.TIMESTAMP, 
     nullable=False
   )
 
@@ -241,7 +241,7 @@ with app.app_context():
   db.create_all()
 
 
-@app.route('/products', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/products', methods=['GET', 'POST'])
 def products():
   """
   Route of products

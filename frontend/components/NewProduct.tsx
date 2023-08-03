@@ -141,9 +141,16 @@ export const NewProduct = () => {
           type="file"
           id="image"
           {...register('image', {
-            required: true,
+            required: {
+              value: true,
+              message: "La imagen es requerida",
+            },
           })}
         />
+        {
+          errors.image &&
+          <span>{ errors.image.message?.toString() }</span>
+        }
 
         <button type='submit'>
           Enviar
