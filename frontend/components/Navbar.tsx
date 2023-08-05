@@ -55,11 +55,12 @@ export const Navbar = () => {
       hideButtons();
 
       if (back.current) {
-        back.current.style.backdropFilter = prevShow ? 'blur(5px)' : 'blur(0)';
+        back.current.style.backdropFilter = prevShow ? 'blur(5px)' : 'blur(0)'
+        back.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(100%)'
       }
 
       if (menu.current) {
-        menu.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(100%)';
+        menu.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(100%)'
       }
 
       return !prevShow;

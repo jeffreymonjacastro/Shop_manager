@@ -1,0 +1,87 @@
+.home {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  &-container {
+    width: 90%;
+  }
+
+  &-categories {
+    width: 100%;
+    font-size: 14px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-category {
+    padding: 5px 10px;
+    background-color: var(--secondary);
+    border-radius: 20px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--primary);
+    }
+  }
+
+  &-products {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 
+    repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+    gap: 10px;
+    justify-items: center;
+    align-items: center;
+  }
+
+  &-product {
+    width: 100%;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s ease;
+    }
+
+    &-image {
+      width: 100%;
+      background-color: var(--background-3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+
+      & img {
+        width: 100%;
+        height: 100%;
+        object-fit: scale-down;
+      }
+    }
+
+    &-icon {
+      position: absolute;
+      top: 0;
+      right: 5px;
+      font-size: 2em;
+      color: rgba(255, 255, 255 ,0.5);
+
+      & svg:hover {
+        color: rgba(255, 255, 255 ,1);
+      }
+
+      & path {
+        display: block;
+        stroke: var(--primary);
+        stroke-width: 10px;
+      }
+    }
+
+    &-name {
+      font-size: 16px;
+    }
+  }
+}
