@@ -94,7 +94,7 @@ export const Navbar = () => {
             </a>
           </li>
           <div ref={logo} className='nav-logo'>
-            <img src={'http://localhost:5173/frontend/assets/Shop_manager_logo.png'} alt="Logo Shop Manager" />
+            <img src={'http://192.168.0.220:5173/frontend/assets/Shop_manager_logo.png'} alt="Logo Shop Manager" />
           </div>
           <p ref={title} className='nav-title'>
             Shop Manager

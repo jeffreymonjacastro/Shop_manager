@@ -243,6 +243,7 @@ with app.app_context():
   db.create_all()
 
 
+# Routes
 @app.route('/products', methods=['GET', 'POST'])
 def products():
   """
@@ -305,6 +306,71 @@ def products():
   except Exception as e:
     return jsonify({'error': str(e)}), 400
 
+
+@app.route('/products/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+def product(id):
+  try:
+    if request.method == 'GET':
+      product = Product.query.filter_by(id=id).first()
+      serialized_product = {
+        'id': product.id,
+        'title': product.title,
+        'price': product.price,
+        'category': product.category,
+        'quantity': product.quantity,
+        'typeof_quantity': product.typeof_quantity,
+        'brand': product.brand,
+        'image_name': product.image_name,
+        'image': base64.b64encode(product.image).decode('utf-8')
+      }
+
+      return jsonify(serialized_product)
+
+    if request.method == 'PUT':
+      title = request.form['title']
+      price = request.form['price']
+      category = request.form['category']
+      quantity = request.form['quantity']
+      typeof_quantity = request.form['typeof_quantity']
+      brand = request.form['brand']
+      image = request.files['image']
+
+      image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))
+
+      binary_image = convertToBinary(f'./static/{image.filename}')
+
+      product = Product.query.filter_by(id=id).first()
+
+      product.title = title
+      product.price = price
+      product.category = category
+      product.quantity = quantity
+      product.typeof_quantity = typeof_quantity
+      product.brand = brand
+      product.image_name = image.filename
+      product.image = binary_image
+
+      db.session.commit()
+
+      try:
+          os.remove(f'./static/{image.filename}')
+      except FileNotFoundError:
+        print(f"El archivo './static/{image.filename}' no existe.")
+      except Exception as e:
+        print(f"Error al eliminar el archivo './static/{image.filename}': {str(e)}")
+
+      return jsonify({'message': 'User updated successfully'}), 200
+
+    if request.method == 'DELETE':
+      product = Product.query.filter_by(id=id).first()
+      db.session.delete(product)
+      db.session.commit()
+
+      return jsonify({'message': 'User deleted successfully'}), 200
+
+  except Exception as e:
+    return jsonify({'error': str(e)}), 400
+    
 
 @app.route('/carshops', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def carshops():

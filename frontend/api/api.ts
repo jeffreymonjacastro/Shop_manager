@@ -24,3 +24,14 @@ export const getProducts = async () => {
   const data = await res.json()
   return data
 }
+
+// Get product by id
+/* This function connects to the localhost to get a product by id
+  * @param {Number} - The id of the product
+  * @returns {Object} - The product
+*/
+export const getProductById = async (id: number) => {
+  const res = await fetch(`${BACKEND_URL}/products/${id}`)
+  const data = await res.json()
+  return data
+}

@@ -1,0 +1,75 @@
+@use '../abstracts/mixins' as mixins;
+
+.product {
+  height: calc(100vh - 95px);
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  margin-top: 20px;
+  
+  &-container {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  &-image {
+    display: flex;
+    justify-content: center;
+    height: 90vw;
+
+    & img {
+      border-radius: 25px;
+      height: 100%;
+    }
+  }
+
+  &-info {
+    margin-top: 10px;
+    font-size: 1.2em;
+  }
+
+  &-price {
+    font-size: 2em;
+    font-weight: 300;
+  }
+
+  &-category {
+    background-color: var(--secondary);
+    width: fit-content;
+    border-radius: 25px;
+    padding: 5px 15px;
+    font-size: 1.3em;
+    font-weight: 300;
+  }
+
+  &-prop {
+    & p {
+      height: 30px;
+      line-height: 30px;
+      margin: 10px 0;
+    }
+  }
+
+  &-units {
+    & button {
+      @include mixins.button_3d(5px, 10px, var(--secondary));
+      margin: 0;
+
+      &:hover {
+        background-color: var(--accent);
+      }
+    }
+
+    & span {
+      margin: 0 10px;
+    }
+  }
+
+  &-buttons {
+    position: absolute;
+    bottom: 0;
+  }
+}
