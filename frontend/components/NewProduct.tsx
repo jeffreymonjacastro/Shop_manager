@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form'
+import { newProduct } from '../api/api'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import '../scss/pages/NewProduct.scss'
-import { useEffect } from 'react'
 
 export const NewProduct = () => {
 
@@ -14,13 +14,34 @@ export const NewProduct = () => {
     reset,
   } = useForm()
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data)
+  // Upload the new product info to the api
+  const onSubmit = handleSubmit(async (data) => {
+    const formData = new FormData()
+    formData.append('title', data.title)
+    formData.append('price', data.price)
+    formData.append('category', data.category)
+    formData.append('quantity', data.quantity)
+    formData.append('typeof_quantity', data.typeof_quantity)
+    formData.append('brand', data.brand)
+    formData.append('image', data.image[0])
 
-    alert('Producto creado')
+    const response = await newProduct(formData)
+
+    alert(response.message)
 
     reset()
   }) 
+
+  const ALLOWED_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif']);
+
+  const allowedFile = (filename: string): boolean => {
+    const fileExtension = filename
+      .split('.')
+      .pop()
+      ?.toLowerCase();
+
+    return fileExtension !== undefined && ALLOWED_EXTENSIONS.has(fileExtension);
+  };
 
   return (
     <main className="newproduct-main">
@@ -172,6 +193,11 @@ export const NewProduct = () => {
                 value: true,
                 message: "La imagen es requerida",
               },
+              validate: (value: any) => {
+                const filename = value[0].name
+
+                return allowedFile(filename) || 'Formato inválido'
+              }
             })}
           />
           {

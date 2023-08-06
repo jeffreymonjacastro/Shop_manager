@@ -1,28 +1,50 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getProducts } from '../api/api'
+import { Product } from './Product'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlusSquare } from '@fortawesome/free-solid-svg-icons'
 import '../scss/pages/Home.scss'
 
-const Product = () => {
+const Products = (
+  {id, title, price, image}: 
+  {id: number, title: string, price: number, image: string}
+  ) => {
   return (
     <div 
-      id='1' 
+      id={id.toString()}
       className="home-product"
-      onClick={() => console.log('click')}
+      onClick={() => {
+        window.location.href = `/product/${id}`
+      }}
     >
       <div className="home-product-image">
-        <img src="https://picsum.photos/300/300" alt="Producto 1" />
+        <img 
+          src={`data:image/png;base64,${image}`} 
+          alt={title} 
+        />
         <div className='home-product-icon'>
           <FontAwesomeIcon icon={faPlusSquare} />
         </div>
       </div>
-      <b className="home-product-name">Producto 1</b>
-      <div className="home-product-price">$ 100</div>
+      <b className="home-product-name">{title}</b>
+      <div className="home-product-price">S/. {price}</div>
     </div>
   )
 }
 
 export const Home = () => { 
+  const [products, setProducts] = useState([])
+
+  const callgetProducts = async () => {
+    const response = await getProducts()
+    setProducts(response || [])
+  }
+
+  useEffect(() => {
+    callgetProducts()
+
+  }, [])
+
   return (
     <main className="home">
       <article className="home-container">
@@ -34,9 +56,19 @@ export const Home = () => {
         </section>
 
         <section className="home-products">
-          <Product />
-          <Product />
-          <Product />
+          {
+            products?.map((product: any) => {
+              return (
+                <Products 
+                  key={product.id}
+                  id={product.id}
+                  title={product.title}
+                  price={product.price}
+                  image={product.image}
+                />
+              )
+            })
+          }
         </section>
       </article>
     </main>

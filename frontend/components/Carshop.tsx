@@ -1,7 +1,9 @@
-
+import '../scss/pages/Carshop.scss'
 
 export const Carshop = () => {
   return (
-    <div>Carshop</div>
+    <main className="carshop">
+      Carshop
+    </main>
   )
 }

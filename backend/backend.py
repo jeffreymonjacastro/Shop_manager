@@ -9,10 +9,6 @@ import base64
 
 # Global variables
 UPLOAD_FOLDER = './static'
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-
-def allowed_file(filename):
-  return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def convertToBinary(filename):
   with open(filename, 'rb') as file:
@@ -46,8 +42,9 @@ class Product(db.Model):
   price: float
   category: str
   quantity: int
-  type_of_quantity: str
+  typeof_quantity: str
   brand: str
+  image_name: str
   image: bytes
 
   id = db.Column(
@@ -77,12 +74,17 @@ class Product(db.Model):
     nullable=False
   )
 
-  type_of_quantity = db.Column(
+  typeof_quantity = db.Column(
     db.String(100), 
     nullable=False
   )
 
   brand = db.Column(
+    db.String(100), 
+    nullable=False
+  )
+
+  image_name = db.Column(
     db.String(100), 
     nullable=False
   )
@@ -247,9 +249,61 @@ def products():
   Route of products
   """
 
-  if request.method == 'GET':
-    products = Product.query.all()
-    return jsonify(products)
+  try:
+    if request.method == 'GET':
+      products = Product.query.all()
+      serialized_products = [{
+        'id': product.id,
+        'title': product.title,
+        'price': product.price,
+        'category': product.category,
+        'quantity': product.quantity,
+        'typeof_quantity': product.typeof_quantity,
+        'brand': product.brand,
+        'image_name': product.image_name,
+        'image': base64.b64encode(product.image).decode('utf-8')
+      } for product in products]
+
+      return jsonify(serialized_products)
+
+    if request.method == 'POST':
+      title = request.form['title']
+      price = request.form['price']
+      category = request.form['category']
+      quantity = request.form['quantity']
+      typeof_quantity = request.form['typeof_quantity']
+      brand = request.form['brand']
+      image = request.files['image']
+
+      image.save(os.path.join(app.config['UPLOAD_FOLDER'], image.filename))
+
+      binary_image = convertToBinary(f'./static/{image.filename}')
+
+      new_product = Product(
+        title=title,
+        price=price,
+        category=category,
+        quantity=quantity,
+        typeof_quantity=typeof_quantity,
+        brand=brand,
+        image_name = image.filename,
+        image=binary_image
+      )
+
+      db.session.add(new_product)
+      db.session.commit()
+
+      try:
+          os.remove(f'./static/{image.filename}')
+      except FileNotFoundError:
+        print(f"El archivo './static/{image.filename}' no existe.")
+      except Exception as e:
+        print(f"Error al eliminar el archivo './static/{image.filename}': {str(e)}")
+
+      return jsonify({'message': 'User created successfully'}), 200
+  
+  except Exception as e:
+    return jsonify({'error': str(e)}), 400
 
 
 @app.route('/carshops', methods=['GET', 'POST', 'PUT', 'DELETE'])

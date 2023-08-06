@@ -143,6 +143,9 @@ export const Navbar = () => {
             <FontAwesomeIcon icon={faBook} />
             <p>Menús</p>
           </a>
+          <div>
+            Made by @jeffrey_amc
+          </div>
         </div>
       </aside>
     </>
