@@ -23,6 +23,10 @@ export const Navbar = () => {
   const logo = useRef<HTMLDivElement>(null)
   const title = useRef<HTMLDivElement>(null)
 
+  const body = document.body;
+
+  !show ? body.style.overflow = 'hidden' : body.style.overflow = 'auto'
+
 
   const hideButtons = () => {
     const translateYValue = show ? '-130%' : '0';

@@ -3,7 +3,9 @@ html, body {
   background-color: var(--background-1);
   color: var(--textcolor);
   font-size: var(--font-size);
-  overflow-x: hidden;
 }
 
+body {
+  overflow-x: hidden !important;
+}
 
