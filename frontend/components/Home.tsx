@@ -1,36 +1,9 @@
 import { useState, useEffect } from 'react'
 import { getProducts } from '../api/api'
-import { Product } from './Product'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlusSquare } from '@fortawesome/free-solid-svg-icons'
+import { ProductHome } from '../components/ProductHome'
 import '../scss/pages/Home.scss'
 
-const Products = (
-  {id, title, price, image}: 
-  {id: number, title: string, price: number, image: string}
-  ) => {
-  return (
-    <div 
-      id={id.toString()}
-      className="home-product"
-      onClick={() => {
-        window.location.href = `/product/${id}`
-      }}
-    >
-      <div className="home-product-image">
-        <img 
-          src={`data:image/png;base64,${image}`} 
-          alt={title} 
-        />
-        <div className='home-product-icon'>
-          <FontAwesomeIcon icon={faPlusSquare} />
-        </div>
-      </div>
-      <b className="home-product-name">{title}</b>
-      <div className="home-product-price">S/. {price}</div>
-    </div>
-  )
-}
+
 
 export const Home = () => { 
   const [products, setProducts] = useState([])
@@ -59,7 +32,7 @@ export const Home = () => {
           {
             products?.map((product: any) => {
               return (
-                <Products 
+                <ProductHome 
                   key={product.id}
                   id={product.id}
                   title={product.title}

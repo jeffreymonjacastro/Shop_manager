@@ -1,36 +1,49 @@
-import { useForm } from 'react-hook-form'
-import { newProduct } from '../api/api'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUpload } from '@fortawesome/free-solid-svg-icons'
-import '../scss/pages/NewProduct.scss'
+import { updateProductById } from "../api/api"
+import { useForm } from "react-hook-form"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faUpload } from "@fortawesome/free-solid-svg-icons"
+import '../scss/pages/EditProduct.scss'
+import { useEffect } from "react"
 
-export const NewProduct = () => {
+export const EditProduct = ({data}: any) => {
 
   const { 
     register, 
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
     reset,
-  } = useForm()
+  } = useForm() 
 
-  // Upload the new product info to the api
-  const onSubmit = handleSubmit(async (data) => {
+  useEffect(() => {
+    setValue('title', data.title)
+    setValue('price', data.price)
+    setValue('category', data.category)
+    setValue('brand', data.brand)
+    setValue('quantity', data.quantity)
+    setValue('typeof_quantity', data.typeof_quantity)
+    setValue('image', data.image)
+    
+    return () => {}
+  }, [data])
+
+  const onSubmit = handleSubmit(async (datos) => {
     const formData = new FormData()
-    formData.append('title', data.title)
-    formData.append('price', data.price)
-    formData.append('category', data.category)
-    formData.append('quantity', data.quantity)
-    formData.append('typeof_quantity', data.typeof_quantity)
-    formData.append('brand', data.brand)
-    formData.append('image', data.image[0])
+    formData.append('title', datos.title)
+    formData.append('price', datos.price)
+    formData.append('category', datos.category)
+    formData.append('quantity', datos.quantity)
+    formData.append('typeof_quantity', datos.typeof_quantity)
+    formData.append('brand', datos.brand)
+    formData.append('image', datos.image[0])
 
-    const response = await newProduct(formData)
+    const response = await updateProductById(data.id, formData)
+    
+    alert(response.message || response.error)
 
-    alert(response.message)
-
-    reset()
-  }) 
+    location.reload()
+  })
 
   const ALLOWED_EXTENSIONS = new Set(['png', 'jpg', 'jpeg', 'gif']);
 
@@ -42,19 +55,20 @@ export const NewProduct = () => {
 
     return fileExtension !== undefined && ALLOWED_EXTENSIONS.has(fileExtension);
   };
-
+  
   return (
-    <main className="newproduct-main">
-      <h2>Nuevo Producto</h2>
-      <form 
-        className="newproduct-form"
+    <article className="product-edit">
+      <h2>Editar Producto</h2>
+      <form
+        className="product-form"
         onSubmit={ onSubmit }
       >
-        <section className="newproduct-form__item">
+        <section className="product-form__item">
           <label htmlFor="title">Título</label>
           <input 
-            type="text"
+            type="text" 
             placeholder='Arroz'
+            defaultValue={data.title}
             id="title"
             {...register('title', {
               required: {
@@ -63,11 +77,11 @@ export const NewProduct = () => {
               },
               minLength: {
                 value: 2,
-                message: 'Mínimo 2 caracteres',
+                message: "Mínimo 2 caracteres",
               },
               maxLength: {
                 value: 30,
-                message: 'Máximo 30 caracteres',
+                message: "Máximo 30 caracteres",
               },
             })}
           />
@@ -76,12 +90,13 @@ export const NewProduct = () => {
             <span>{ errors.title.message?.toString() }</span>
           }
         </section>
-        
-        <section className="newproduct-form__item">
-          <label htmlFor="price">Precio</label>
+
+        <section className="product-form__item">
+        <label htmlFor="price">Precio</label>
           <input
             type="number"
             placeholder='S/.'
+            defaultValue={data.price}
             step={0.01}
             id="price"
             {...register('price', {
@@ -105,10 +120,11 @@ export const NewProduct = () => {
           }
         </section>
 
-        <section className="newproduct-form__item">
+        <section className="product-form__item">
           <label htmlFor="category">Categoría</label>
           <select 
             id="category"
+            defaultValue={data.category}
             {...register('category')} 
           >
             <option value="FrutasVerduras">Frutas y Verduras</option>
@@ -118,11 +134,12 @@ export const NewProduct = () => {
           </select>
         </section>
 
-        <section className="newproduct-form__item">
+        <section className="product-form__item">
           <label htmlFor="brand">Marca</label>
           <input 
             type="text" 
             placeholder='Norteño'
+            defaultValue={data.brand}
             id="brand"
             {...register('brand', {
               required: {
@@ -145,9 +162,10 @@ export const NewProduct = () => {
           }
         </section>
 
-        <section className="newproduct-form__item">
+        <section className="product-form__item">
           <label htmlFor="quantity">Cantidad</label>
           <select
+            defaultValue={data.typeof_quantity}
             {...register('typeof_quantity')}
           >
             <option value="kg">Kg</option>
@@ -158,6 +176,7 @@ export const NewProduct = () => {
           <input
             type="number"
             placeholder='200'
+            defaultValue={data.quantity}
             id="quantity"
             {...register('quantity', {
               required: {
@@ -180,13 +199,17 @@ export const NewProduct = () => {
           }
         </section>
 
-        <section className="newproduct-form__item">
+        <section className="product-form__item">
           <label htmlFor="image">Imagen</label>
           <label htmlFor='image'>
             <FontAwesomeIcon icon={faUpload} />
           </label>
           <label htmlFor="image">
-            { watch('image')?.length > 0 ? watch('image')?.[0].name : 'Selecciona una imagen'}
+            { 
+              watch('image')?.length > 2 ?
+              data.image_name :
+              watch('image')?.[0].name
+            }
           </label>
           <input
             type="file"
@@ -211,18 +234,23 @@ export const NewProduct = () => {
 
         <section className='newproduct-form__image'>
           <img src={
+            watch('image')?.length > 2 ?
+            `data:image/png;base64,${watch('image')}` 
+            :
             watch('image')?.length > 0 ? 
-            URL.createObjectURL(watch('image')[0]) :
-            ''
+            URL.createObjectURL(watch('image')[0]) : ''
           } alt={ 
+            watch('image')?.length > 2 ?
+            data.image_name 
+            :
             watch('image')?.length > 0 ? 
             watch('image')[0].name : '' } />
         </section>
 
         <button type='submit'>
-          Crear Producto
+          Editar Producto
         </button>
       </form>
-    </main>
+    </article>
   )
 }

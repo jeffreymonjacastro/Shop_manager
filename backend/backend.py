@@ -168,6 +168,7 @@ class Belong_car(db.Model):
 
   product_id: int
   carshop_id: int
+  units: int
 
   product_id = db.Column(
     db.Integer, 
@@ -189,6 +190,11 @@ class Belong_car(db.Model):
   r_carshop = db.relationship(
     'Carshop', 
     backref='belong_car'
+  )
+
+  units = db.Column(
+    db.Integer,
+    nullable=False
   )
 
 
@@ -301,7 +307,7 @@ def products():
       except Exception as e:
         print(f"Error al eliminar el archivo './static/{image.filename}': {str(e)}")
 
-      return jsonify({'message': 'User created successfully'}), 200
+      return jsonify({'message': 'Producto creado'}), 200
   
   except Exception as e:
     return jsonify({'error': str(e)}), 400
@@ -359,14 +365,14 @@ def product(id):
       except Exception as e:
         print(f"Error al eliminar el archivo './static/{image.filename}': {str(e)}")
 
-      return jsonify({'message': 'User updated successfully'}), 200
+      return jsonify({'message': 'Producto actualizado'}), 200
 
     if request.method == 'DELETE':
       product = Product.query.filter_by(id=id).first()
       db.session.delete(product)
       db.session.commit()
 
-      return jsonify({'message': 'User deleted successfully'}), 200
+      return jsonify({'message': 'Producto eliminado'}), 200
 
   except Exception as e:
     return jsonify({'error': str(e)}), 400
