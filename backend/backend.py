@@ -117,7 +117,6 @@ class Carshop(db.Model):
 
   meal = db.Column(
     db.String(100), 
-    primary_key=True,
     nullable=False
   )
 
@@ -169,6 +168,7 @@ class Belong_car(db.Model):
   product_id: int
   carshop_id: int
   units: int
+  type_of_quantity: str
 
   product_id = db.Column(
     db.Integer, 
@@ -179,22 +179,27 @@ class Belong_car(db.Model):
   carshop_id = db.Column(
     db.Integer, 
     db.ForeignKey('shop_manager.Carshop.id'),
-    primary_key=True, 
+    primary_key = True, 
   )
 
   r_product = db.relationship(
     'Product', 
-    backref='carshops'
+    backref = 'carshops'
   )
 
   r_carshop = db.relationship(
     'Carshop', 
-    backref='belong_car'
+    backref = 'belong_car'
   )
 
   units = db.Column(
     db.Integer,
-    nullable=False
+    nullable = False
+  )
+
+  type_of_quantity = db.Column(
+    db.String(3),
+    nullable = False
   )
 
 

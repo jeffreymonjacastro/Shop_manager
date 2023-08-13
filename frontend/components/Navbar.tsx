@@ -25,7 +25,12 @@ export const Navbar = () => {
 
   const body = document.body;
 
-  !show ? body.style.overflow = 'hidden' : body.style.overflow = 'auto'
+  if (!show) {
+    body.style.overflow = 'hidden'
+  } else {
+    body.style.overflowX = 'hidden'
+    body.style.overflowY = 'auto'
+  }
 
 
   const hideButtons = () => {
@@ -60,7 +65,7 @@ export const Navbar = () => {
 
       if (back.current) {
         back.current.style.backdropFilter = prevShow ? 'blur(5px)' : 'blur(0)'
-        back.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(100%)'
+        back.current.style.transform = prevShow ? 'translateX(0)' : 'translateX(150%)'
       }
 
       if (menu.current) {
